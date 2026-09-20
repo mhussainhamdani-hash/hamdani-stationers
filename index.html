@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hamdani Stationers | Gojra</title>
+<meta name="description" content="Hamdani Stationers Gojra - Stationery, Paper Products & General Items. Retail and wholesale supply.">
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter, Arial, sans-serif;color:#14231d;background:#fff;line-height:1.6}
+.container{width:min(1140px,92%); margin:auto}
+.top{background:#143e31;color:#e9f5f0;text-align:center;padding:8px;font-size:12px;font-weight:600;letter-spacing:.2px}
+header{height:74px;border-bottom:1px solid #e7eeea;background:#fffffff2;backdrop-filter:blur(12px);position:sticky;top:0;z-index:20}
+.nav{height:100%;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:9px;color:#143e31;text-decoration:none;font-weight:800;font-size:20px}
+.brand span{width:38px;height:38px;border-radius:11px;background:#143e31;color:#fff;display:grid;place-items:center;font-size:20px}
+.brand small{display:block;font-size:10px;letter-spacing:2px;font-weight:700;color:#6a7b73}
+.nav nav{display:flex;gap:20px;align-items:center}
+.nav nav a{font-size:13px;font-weight:700;text-decoration:none;color:#263630}
+.nav nav a:hover{color:#26705a}
+#menuBtn{display:none;background:none;border:0;font-size:28px}
+.hero{padding:95px 0;background:radial-gradient(circle at 85% 45%,#dff1e90,#eef7f3 30%, #f8fbfa 70%)}
+.heroGrid{display:grid;grid-template-columns:1.15fr .85fr;align-items:center;gap:80px}
+.badge{display:inline-block;font-size:11px;letter-spacing:2px;font-weight:800;color:#26705a;margin-bottom:14px}
+.hero h1,.section h2{font-size:clamp(38px,5.2vw, 65px);line-height:1.05;letter-spacing:-2.5px;margin:0 0 20px}
+.hero h1 i{font-style:normal;color:#26705a}
+.hero p{font-size:18px;color:#63716b;max-width:680px}
+.buttons{display:flex;gap:11px;flex-wrap:wrap;margin:28px 0}
+.btn{display:inline-block;padding:13px 19px;border-radius:10px;background:#143e31;color:#fff;text-decoration:none;border:1px solid #143e31;font-weight:800;font-size:13px;cursor:pointer}
+.btn.outline{background:#fff;color:#143e31}
+.mini{display:flex;gap:17px;flex-wrap:wrap;font-size:12px;color:#66766e}
+.heroVisual{min-height:410px;position:relative;display:grid;place-items:center}
+.heroCircle{width:290px;height:290px;border-radius:50%;background:#143e31;color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 30px 80px #143e3133}
+.heroCircle strong{font-size:86px;line-height:.8}
+.heroCircle small{text-align:center;letter-spacing:4px;font-size:11px;margin-top:13px}
+.pencil{font-size:25px}
+.floating{position:absolute;background:#fff;border:1px solid #dce7e1;border-radius:15px;padding:15px 18px;box-shadow:0 18px 45px #143e3115;font-size:28px;display:grid;grid-template-columns:auto 1fr;column-gap:10px}
+.floating b{font-size:13px;align-self:end}
+.floating small{font-size:10px;color:#728078;grid-column:2}
+.f1{top:45px;left:5px}
+.f2{right:0;bottom:45px}
+.quick{border-bottom:1px solid #e7eeea}
+.quickGrid{display:grid;grid-template-columns:repeat(4,1fr)}
+.quickGrid div{padding:25px 15px;border-right:1px solid #e7eeea}
+.quickGrid div:last-child{border:0}
+.quickGrid b,.quickGrid span{display:block}
+.quickGrid b{font-size:14px}
+.quickGrid span{font-size:11px;color:#78867f}
+.section{padding:90px 0}
+.heading{text-align:center;max-width:720px;margin:0 auto 42px}
+.heading h2,.about h2,.order h2,.contact h2{font-size:43px}
+.heading p{color:#6a7771}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:17px}
+.cards article{border:1px solid #e0e9e4;border-radius:16px;padding:27px;background:#fff;transition:.2s}
+.cards article:hover{transform:translateY(-4px);box-shadow:0 18px 45px #143e3110}
+.ico{font-size:31px}
+.cards h3{margin:13px 0 6px}
+.cards p{font-size:13px;color:#68766f;min-height:63px}
+.cards a{font-size:12px;color:#26705a;font-weight:800;text-decoration:none}
+.catalog{background:#f5f8f6}
+.heading.left{text-align:left;margin-left:0}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:25px}
+.filters button{border:1px solid #d4dfd9;background:#fff;border-radius:99px;padding:8px 15px;font-weight:700;font-size:12px;cursor:pointer}
+.filters button.active{background:#143e31;color:#fff}
+.items{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.item{background:#fff;border:1px solid #e0e8e3;border-radius:14px;padding:16px;display:grid;gap:6px}
+.itemPic{height:130px;background:#edf4f0;border-radius:10px;display:grid;place-items:center;font-size:48px;overflow:hidden}
+.itemPic img{width:100%;height:100%;object-fit:cover;border-radius:10px}
+.item b{font-size:14px}
+.item span{font-size:11px;color:#75827c}
+.item .priceTag{font-weight:800;color:#143e31;font-size:14px}
+.item button{margin-top:7px;border:0;background:#143e31;color:#fff;border-radius:8px;padding:9px;font-weight:800;cursor:pointer}
+.item .deleteBtn{background:#c0392b;margin-top:2px}
+.about{background:#143e31;color:#fff}
+.about .badge{color:#a8d8c7}
+.aboutGrid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.about p{color:#c5d7d0;font-size:15px}
+.promise{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.promise div{border:1px solid #4e7568;border-radius:13px;padding:19px}
+.promise b{margin-left:6px}
+.promise small{display:block;color:#aec6bd;font-size:11px;margin-left:23px}
+.order{background:#f7faf8}
+.orderGrid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.order p{color:#68766f}
+.orderTips{display:grid;gap:9px;color:#51625a;font-size:13px}
+.orderTips span{background:#fff;border:1px solid #e0e9e4;border-radius:8px;padding:10px}
+.order form{background:#fff;border:1px solid #e0e8e3;border-radius:16px;padding:25px;display:grid;gap:11px}
+input, textarea, select{font:inherit;border:1px solid #d6e0da;border-radius:99px;padding:12px;width:100%;outline:none}
+textarea{resize:vertical;border-radius:9px}
+input:focus,textarea:focus, select:focus{border-color:#26705a}
+.contactGrid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.contact a{color:#143e31;font-weight:800;text-decoration:none}
+.map{height:330px;border-radius:18px;overflow:hidden;border:1px solid #dfe8e3}
+.map iframe{width:100%;height:100%;border:0}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:30px}
+.foot p{color:#a8bbb3;font-size:11px}
+footer{background:#0c2b23;color:#fff;padding:30px 0}
+.foot .brand{color:#fff}
+.foot .brand span{background:#fff;color:#143e31}
+.foot .brand small{color:#a8bbb3}
+.modalOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:none;place-items:center;z-index:100}
+.modalContent{background:#fff;padding:30px;border-radius:16px;width:min(450px,90%);position:relative}
+.modalContent h3{margin-top:0;color:#143e31;font-size:22px}
+.closeBtn{position:absolute;top:15px;right:15px;border:0;background:none;font-size:20px;cursor:pointer}
+.adminBtnNav{background:#143e31;color:#fff;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none}
+@media (max-width:800px){
+  .nav nav{display:none;position:absolute;top:74px;right:4%;background:#fff;padding:18px;border-radius:12px;box-shadow:0 15px 45px #0002;flex-direction:column;gap:15px}
+  .nav nav.show{display:flex}
+  #menuBtn{display:block}
+  .hero{padding:60px 0}
+  .heroGrid,.aboutGrid, .orderGrid,.contactGrid{grid-template-columns:1fr;gap:40px}
+  .heroVisual{min-height:330px}
+  .quickGrid{grid-template-columns:1fr 1fr}
+  .quickGrid div:nth-child(2){border-right:0}
+  .cards,.items{grid-template-columns:1fr 1fr}
+  .section{padding:65px 0}
+  .heading h2,.about h2,.order h2,.contact h2{font-size:36px}
+  .foot{display:block}
+  .foot>div+div{margin-top:20px}
+}
+@media (max-width:520px){
+  .cards,.items{grid-template-columns:1fr}
+  .hero h1{font-size:42px}
+  .heroCircle{width:240px;height:240px}
+  .f1{left:0}
+  .f2{right:0}
+  .promise{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="top">Retail mein Wholesale Price Enjoy Karein Gojra | Call: 03458187157</div>
+
+<header>
+  <div class="container nav">
+    <a class="brand" href="#home"><span>H</span><div>Hamdani <small>Stationers</small></div></a>
+    <button id="menuBtn">☰</button>
+    <nav id="nav">
+      <a href="#home">Home</a>
+      <a href="#products">Products</a>
+      <a href="#catalog">Catalog</a>
+      <a href="#about">About</a>
+      <a href="#order">Order</a>
+      <a href="#contact">Contact</a>
+      <a href="javascript:void(0)" onclick="openAdminModal()" class="adminBtnNav">Admin</a>
+    </nav>
+  </div>
+</header>
+
+<section id="home" class="hero">
+  <div class="container heroGrid">
+    <div>
+      <div class="badge">YOUR FIRST CHOICE</div>
+      <h1>Stationery made <i>simple.</i><br>Supply made reliable.</h1>
+      <p>Stationery, paper products and general items for homes, schools, offices, madrasas, shops and businesses.</p>
+      <div class="buttons">
+        <a class="btn" href="#products">Shop Categories</a>
+        <a class="btn outline" target="_blank" href="https://wa.me/923458187157?text=Assalam-o-Alaikum%2C%20I%20want%20to%20ask%20about%20your%20products.">WhatsApp Us</a>
+      </div>
+      <div class="mini"><span>Retail</span><span>Wholesale</span><span>Bulk Supply</span></div>
+    </div>
+    <div class="heroVisual">
+      <div class="floating f1"><b>School</b><small>Supplies</small></div>
+      <div class="floating f2"><b>Paper</b><small>Products</small></div>
+      <div class="heroCircle">
+        <div class="pencil">✏️</div>
+        <strong>H</strong>
+        <small>HAMDANI<br>STATIONERS</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="quick">
+  <div class="container quickGrid">
+    <div><b>Retail & Wholesale</b><span>Competitive pricing</span></div>
+    <div><b>All-in-One Supply</b><span>Stationery + general items</span></div>
+    <div><b>Easy Ordering</b><span>Order directly on WhatsApp</span></div>
+    <div><b>Gojra</b><span>Jhang Road</span></div>
+  </div>
+</section>
+
+<section id="products" class="section">
+  <div class="container">
+    <div class="heading">
+      <div class="badge">PRODUCTS</div>
+      <h2>Everything you need, in one place.</h2>
+      <p>Browse our main categories. Ask us for current prices and availability.</p>
+    </div>
+    <div class="cards">
+      <article data-cat="school">
+        <div class="ico">📚</div>
+        <h3>School Stationery</h3>
+        <p>Notebooks, registers, pens, pencils, colors, geometry and school essentials.</p>
+        <a href="#order" data-product="School Stationery">Request Price →</a>
+      </article>
+      <article data-cat="paper">
+        <div class="ico">📄</div>
+        <h3>Paper Products</h3>
+        <p>Copy paper, printing paper, files, folders and everyday paper supplies.</p>
+        <a href="#order" data-product="Paper Products">Request Price →</a>
+      </article>
+      <article data-cat="office">
+        <div class="ico">💼</div>
+        <h3>Office Supplies</h3>
+        <p>Desk stationery, filing products, business forms and office essentials.</p>
+        <a href="#order" data-product="Office Supplies">Request Price →</a>
+      </article>
+      <article data-cat="madrasa">
+        <div class="ico">📖</div>
+        <h3>Madrasa Supplies</h3>
+        <p>Educational and writing supplies for madrasas and Quran classes.</p>
+        <a href="#order" data-product="Madrasa Supplies">Request Price →</a>
+      </article>
+      <article data-cat="general">
+        <div class="ico">📦</div>
+        <h3>General Items</h3>
+        <p>A growing range of useful general-purpose and household products.</p>
+        <a href="#order" data-product="General Items">Request Price →</a>
+      </article>
+      <article data-cat="bulk">
+        <div class="ico">🏭</div>
+        <h3>Wholesale & Bulk</h3>
+        <p>Shop orders, bulk quantities and regular supply arrangements.</p>
+        <a href="#order" data-product="Wholesale / Bulk Order">Request Quote →</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="catalog" class="section catalog">
+  <div class="container">
+    <div class="heading left">
+      <div class="badge">ONLINE CATALOG</div>
+      <h2>Popular items</h2>
+      <p>Prices can change with market rates. Contact us for today's price.</p>
+    </div>
+    <div class="filters">
+      <button class="active" data-filter="all">All</button>
+      <button data-filter="school">School</button>
+      <button data-filter="paper">Paper</button>
+      <button data-filter="office">Office</button>
+      <button data-filter="general">General</button>
+    </div>
+    <div class="items" id="catalogItemsContainer">
+      <div class="item" data-type="school">
+        <div class="itemPic">✒️</div>
+        <b>Writing Pens</b>
+        <span>Retail / Wholesale</span>
+        <button onclick="quickOrder('Writing Pens')">Ask Price</button>
+      </div>
+      <div class="item" data-type="school">
+        <div class="itemPic">📓</div>
+        <b>Notebooks & Registers</b>
+        <span>Multiple sizes</span>
+        <button onclick="quickOrder('Notebooks & Registers')">Ask Price</button>
+      </div>
+      <div class="item" data-type="paper">
+        <div class="itemPic">📃</div>
+        <b>Copy / Printing Paper</b>
+        <span>Bulk available</span>
+        <button onclick="quickOrder('Copy / Printing Paper')">Ask Price</button>
+      </div>
+      <div class="item" data-type="office">
+        <div class="itemPic">📁</div>
+        <b>Files & Folders</b>
+        <span>Office essentials</span>
+        <button onclick="quickOrder('Files & Folders')">Ask Price</button>
+      </div>
+      <div class="item" data-type="school">
+        <div class="itemPic">✏️</div>
+        <b>Pencils & Colors</b>
+        <span>School supplies</span>
+        <button onclick="quickOrder('Pencils & Colors')">Ask Price</button>
+      </div>
+      <div class="item" data-type="general">
+        <div class="itemPic">📦</div>
+        <b>General Items</b>
+        <span>Ask for availability</span>
+        <button onclick="quickOrder('General Items')">Ask Price</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="about" class="section about">
+  <div class="container aboutGrid">
+    <div>
+      <div class="badge">ABOUT HAMDANI</div>
+      <h2>Quality. Integrity. Trust. Growth.</h2>
+      <p>Hamdani Stationers is focused on dependable supply and competitive pricing across stationery, paper products and general items.</p>
+      <p>We aim to serve individual customers as well as shops, schools, offices, madrasas and organizations.</p>
+    </div>
+    <div class="promise">
+      <div><b>Quality</b><small>Products selected for everyday use</small></div>
+      <div><b>Value</b><small>Retail and wholesale pricing</small></div>
+      <div>✓ <b>Service</b><small>Simple ordering and communication</small></div>
+      <div>✓ <b>Growth</b><small>Expanding product range</small></div>
+    </div>
+  </div>
+</section>
+
+<section id="order" class="section order">
+  <div class="container orderGrid">
+    <div>
+      <div class="badge">ORDER / QUOTE</div>
+      <h2>Send us your requirements.</h2>
+      <p>Fill in the form. It will open WhatsApp with your order request.</p>
+      <div class="orderTips">
+        <span>1. Product name</span>
+        <span>2. Quantity</span>
+        <span>3. Retail or wholesale</span>
+      </div>
+    </div>
+    <form id="orderForm">
+      <input id="name" placeholder="Your name" required>
+      <input id="phone" placeholder="Phone number" required>
+      <textarea id="items" rows="6" placeholder="Example: 10 registers, 2 boxes pens..." required></textarea>
+      <select id="type">
+        <option>Retail</option>
+        <option>Wholesale</option>
+        <option>Bulk / Shop Order</option>
+      </select>
+      <button class="btn" type="submit">Send on WhatsApp →</button>
+    </form>
+  </div>
+</section>
+
+<section id="contact" class="section contact">
+  <div class="container contactGrid">
+    <div>
+      <div class="badge">CONTACT</div>
+      <h2>Hamdani Stationers</h2>
+      <p><b>Jhang Road, Gojra</b><br>District Toba Tek Singh, Punjab, Pakistan</p>
+      <p><a href="tel:+923458187157">03458187157</a></p>
+      <div class="buttons">
+        <a class="btn" target="_blank" href="https://wa.me/923458187157">WhatsApp</a>
+        <a class="btn outline" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Hamdani+Stationers+Jhang+Road+Gojra">Open in Google Maps</a>
+      </div>
+    </div>
+    <div class="map">
+      <iframe title="Hamdani Stationers Gojra map" src="https://www.google.com/maps?q=Jhang%20Road%20Gojra%20Punjab%20Pakistan&output=embed" loading="lazy"></iframe>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container foot">
+    <div>
+      <div class="brand"><span>H</span><div>Hamdani <small>Stationers</small></div></div>
+      <p>Stationery, Paper Products & General Items</p>
+    </div>
+    <div>
+      <b>Integrity | Quality | Trust | Growth</b>
+      <p><span id="year"></span> Hamdani Stationers | <a href="javascript:void(0)" onclick="openAdminModal()" style="color:#a8bbb3;">Admin Panel</a></p>
+    </div>
+  </div>
+</footer>
+
+<div id="adminModal" class="modalOverlay">
+  <div class="modalContent">
+    <button class="closeBtn" onclick="closeAdminModal()">X</button>
+    <div id="loginFormSection">
+      <h3>Admin Login</h3>
+      <div style="display:grid; gap:10px;">
+        <input type="text" id="adminUser" placeholder="Username (Default: admin)">
+        <input type="password" id="adminPass" placeholder="Password (Default: 1234)">
+        <button class="btn" onclick="adminLogin()">Login</button>
+        <p id="loginError" style="color:red; font-size:12px; margin:0; display:none;">Invalid Credentials!</p>
+      </div>
+    </div>
+    <div id="adminPanelSection" style="display:none;">
+      <h3>Add Product with Price</h3>
+      <form id="addProductForm" style="display:grid; gap:10px;">
+        <input type="text" id="prodTitle" placeholder="Product Title (e.g. Geometry Box)" required>
+        <input type="text" id="prodPrice" placeholder="Price (e.g. Rs. 250)" required>
+        <select id="prodCat">
+          <option value="school">School</option>
+          <option value="paper">Paper</option>
+          <option value="office">Office</option>
+          <option value="general">General</option>
+        </select>
+        <input type="text" id="prodDesc" placeholder="Subtitle / Note (e.g. Best quality)">
+        <label style="font-size:12px; font-weight:700;">Upload Picture:</label>
+        <input type="file" id="prodPic" accept="image/*" required>
+        <button class="btn" type="submit" id="addBtn">Add Product</button>
+        <button class="btn outline" type="button" onclick="adminLogout()">Logout</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+// --- 1. FIREBASE CONFIGURATION ---
+const firebaseConfig = {
+  apiKey: "AIzaSyDXFrQNumC2Z6CG-2pEhHi4TjVQSYcNtrI",
+  authDomain: "hamdani-website.firebaseapp.com",
+  projectId: "hamdani-website",
+  storageBucket: "hamdani-website.firebasestorage.app",
+  messagingSenderId: "21249201166",
+  appId: "1:21249201166:web:9a16292593dce24721985f",
+  measurementId: "G-LSGML14MTH"
+};
+
+// Initialize Firebase & Firestore
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// --- 2. NAVIGATION & GENERAL JS ---
+const nav = document.getElementById('nav');
+document.getElementById('menuBtn').onclick = () => nav.classList.toggle('show');
+document.getElementById('year').textContent = new Date().getFullYear();
+
+function bindFilterEvents(){
+  document.querySelectorAll('.filters button').forEach(btn => btn.onclick = () => {
+    document.querySelectorAll('.filters button').forEach(x => x.classList.remove('active'));
+    btn.classList.add('active');
+    const f = btn.dataset.filter;
+    document.querySelectorAll('.item').forEach(i => i.style.display = (f === 'all' || i.dataset.type === f) ? 'grid' : 'none');
+  });
+}
+bindFilterEvents();
+
+function quickOrder(product, price){
+  let text = product + (price ? ' (' + price + ')' : '') + ' - Quantity: ';
+  document.getElementById('items').value = text;
+  document.getElementById('order').scrollIntoView({behavior:'smooth'});
+  document.getElementById('items').focus();
+}
+
+document.querySelectorAll('[data-product]').forEach(a => a.onclick = () => {
+  setTimeout(() => document.getElementById('items').value = a.dataset.product + ' - Quantity: ', 100);
+});
+
+document.getElementById('orderForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = document.getElementById('name').value;
+  const phone = document.getElementById('phone').value;
+  const items = document.getElementById('items').value;
+  const type = document.getElementById('type').value;
+  
+  const text = `Assalam-o-Alaikum, I want to place an order/request a quote.\n\nName: ${name}\nPhone: ${phone}\nOrder Type: ${type}\nProducts/Quantities:\n${items}`;
+  window.open('https://wa.me/923458187157?text=' + encodeURIComponent(text), '_blank');
+});
+
+// --- 3. ADMIN PANEL & FIREBASE REALTIME SYNC ---
+let isAdmin = false;
+const ADMIN_USER = "admin";
+const ADMIN_PASS = "1234";
+
+function openAdminModal(){ document.getElementById('adminModal').style.display='grid'; }
+function closeAdminModal(){ document.getElementById('adminModal').style.display='none'; }
+
+function adminLogin(){
+  const u = document.getElementById('adminUser').value;
+  const p = document.getElementById('adminPass').value;
+  if(u === ADMIN_USER && p === ADMIN_PASS){
+    isAdmin = true;
+    document.getElementById('loginFormSection').style.display = 'none';
+    document.getElementById('adminPanelSection').style.display = 'block';
+    document.getElementById('loginError').style.display = 'none';
+    renderProducts();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+
+function adminLogout(){
+  isAdmin = false;
+  document.getElementById('loginFormSection').style.display = 'block';
+  document.getElementById('adminPanelSection').style.display = 'none';
+  renderProducts();
+}
+
+// Global variable to hold dynamic products from Firebase
+let customProducts = [];
+
+// Real-time Firestore Listener: updates the page automatically when database changes
+db.collection('products').onSnapshot(snapshot => {
+  customProducts = [];
+  snapshot.forEach(doc => {
+    customProducts.push({ id: doc.id, ...doc.data() });
+  });
+  renderProducts();
+}, err => {
+  console.log("Firebase Database Error: ", err);
+});
+
+// Add Product to Firebase
+document.getElementById('addProductForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const addBtn = document.getElementById('addBtn');
+  addBtn.innerText = "Adding...";
+  addBtn.disabled = true;
+
+  const title = document.getElementById('prodTitle').value;
+  const price = document.getElementById('prodPrice').value;
+  const cat = document.getElementById('prodCat').value;
+  const desc = document.getElementById('prodDesc').value || 'Available now';
+  const fileInput = document.getElementById('prodPic');
+
+  if(fileInput.files && fileInput.files[0]){
+    const reader = new FileReader();
+    reader.onload = function(evt){
+      const imgData = evt.target.result;
+      
+      db.collection('products').add({
+        title: title,
+        price: price,
+        cat: cat,
+        desc: desc,
+        img: imgData,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        alert('Product added successfully to database!');
+        document.getElementById('addProductForm').reset();
+        addBtn.innerText = "Add Product";
+        addBtn.disabled = false;
+      }).catch(error => {
+        alert('Error adding product: ' + error.message);
+        addBtn.innerText = "Add Product";
+        addBtn.disabled = false;
+      });
+    };
+    reader.readAsDataURL(fileInput.files[0]);
+  }
+});
+
+// Delete Product from Firebase
+function deleteProduct(docId){
+  if(confirm("Are you sure you want to delete this product?")){
+    db.collection('products').doc(docId).delete()
+      .then(() => alert("Product deleted!"))
+      .catch(err => alert("Error deleting: " + err.message));
+  }
+}
+
+// Render dynamic products onto the page
+function renderProducts(){
+  const container = document.getElementById('catalogItemsContainer');
+  document.querySelectorAll('.dynamicItem').forEach(e => e.remove());
+
+  customProducts.forEach(p => {
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'item dynamicItem';
+    itemDiv.setAttribute('data-type', p.cat);
+    
+    let deleteHtml = isAdmin ? `<button class="deleteBtn" onclick="deleteProduct('${p.id}')">Delete Item</button>` : '';
+    
+    itemDiv.innerHTML = `
+      <div class="itemPic"><img src="${p.img}" alt="${p.title}"></div>
+      <b>${p.title}</b>
+      <div class="priceTag">${p.price}</div>
+      <span>${p.desc}</span>
+      <button onclick="quickOrder('${p.title}', '${p.price}')">Order Now</button>
+      ${deleteHtml}
+    `;
+    container.appendChild(itemDiv);
+  });
+  
+  // Re-apply active category filter
+  const activeFilter = document.querySelector('.filters button.active');
+  if(activeFilter) activeFilter.click();
+}
+</script>
+</body>
+</html>
